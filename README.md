@@ -1396,3 +1396,5 @@ https://github.com/jaggedsoft/php-binance-api/tree/gh-pages
 
 > # ⚠️ Binance no longer offers support for API projects.
 > ## No support is offered. No questions will be answered.
+### Adding Binance Future Api
+ 
