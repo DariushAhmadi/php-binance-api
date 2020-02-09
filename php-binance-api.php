@@ -939,7 +939,7 @@ class API
             }
 
             $base = $this->base;
-            $base .= ($future)? "api/" : "fapi/";
+            $base .= ($future)? "fapi/" : "api/";
             $ts = (microtime(true) * 1000) + $this->info['timeOffset'];
             $params['timestamp'] = number_format($ts, 0, '.', '');
             if (isset($params['wapi'])) {
