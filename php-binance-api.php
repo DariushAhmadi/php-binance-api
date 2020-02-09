@@ -50,10 +50,10 @@ class API
     private $btc_total = 0.00;
 
     // /< value of available onOrder assets
-    
+
     protected $exchangeInfo = NULL;
     protected $query_logs = [];
-    
+
     /**
      * Constructor for the class,
      * send as many argument as you want.
@@ -325,8 +325,8 @@ class API
     {
         return $this->order("BUY", $symbol, $quantity, 0, "MARKET", $flags, true);
     }
-	
-	
+
+
     /**
      * numberOfDecimals() returns the signifcant digits level based on the minimum order amount.
      *
@@ -337,7 +337,7 @@ class API
      */
     public function numberOfDecimals($val = 0.00000001){
         $val = sprintf("%.14f", $val);
-        $parts = explode('.', $val); 
+        $parts = explode('.', $val);
         $parts[1] = rtrim($parts[1], "0");
         return strlen($parts[1]);
     }
@@ -451,15 +451,15 @@ class API
      */
     public function orders(string $symbol, int $limit = 500, int $fromOrderId = 1, array $params = [])
     {
-        
+
         $parameters = [
             "symbol" => $symbol,
             "limit" => $limit,
         ];
         if($fromOrderId > 0) $parameters[] = ["orderId" => $fromOrderId];
-        
+
         $parameters = array_merge($parameters, $params);
-        
+
         return $this->httpRequest("v3/allOrders", "GET", $parameters, true);
     }
 
@@ -530,18 +530,18 @@ class API
     public function exchangeInfo()
     {
         if(!$this->exchangeInfo){
-            
+
             $arr = $this->httpRequest("v1/exchangeInfo");
-            
+
             $this->exchangeInfo = $arr;
             $this->exchangeInfo['symbols'] = null;
-            
+
             foreach($arr['symbols'] as $key => $value){
                 $this->exchangeInfo['symbols'][$value['symbol']] = $value;
             }
-            
+
         }
-        
+
         return $this->exchangeInfo;
     }
 
@@ -722,6 +722,19 @@ class API
     public function account()
     {
         return $this->httpRequest("v3/account", "GET", [], true);
+    }
+
+    /**
+     * account get all information about the future account
+     *
+     * $account = $api->faccount();
+     *
+     * @return array with error message or array of all the futures account information
+     * @throws \Exception
+     */
+    public function faccount()
+    {
+        return $this->httpRequest("v1/account", "GET", [], true, true);
     }
 
     /**
@@ -926,7 +939,7 @@ class API
             }
 
             $base = $this->base;
-	    $base .= ($future)? "api/" : "fapi/";
+            $base .= ($future)? "api/" : "fapi/";
             $ts = (microtime(true) * 1000) + $this->info['timeOffset'];
             $params['timestamp'] = number_format($ts, 0, '.', '');
             if (isset($params['wapi'])) {
@@ -937,8 +950,8 @@ class API
             $signature = hash_hmac('sha256', $query, $this->api_secret);
             if ($method === "POST") {
                 $endpoint = $base . $url;
-				$params['signature'] = $signature; // signature needs to be inside BODY
-				$query = http_build_query($params, '', '&'); // rebuilding query
+                $params['signature'] = $signature; // signature needs to be inside BODY
+                $query = http_build_query($params, '', '&'); // rebuilding query
             } else {
                 $endpoint = $base . $url . '?' . $query . '&signature=' . $signature;
             }
@@ -1006,15 +1019,15 @@ class API
             echo 'Curl error: ' . curl_error($curl) . "\n";
             return [];
         }
-    
+
         $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
         $header = substr($output, 0, $header_size);
         $output = substr($output, $header_size);
-        
+
         curl_close($curl);
-        
+
         $json = json_decode($output, true);
-        
+
         $this->query_logs[] = [
             'url' => $url,
             'method' => $method,
@@ -1022,7 +1035,7 @@ class API
             'header' => $header,
             'json' => $json
         ];
-        
+
         if(isset($json['msg'])){
             // should always output error, not only on httpdebug
             // not outputing errors, hides it from users and ends up with tickets on github
@@ -1536,9 +1549,9 @@ class API
     {
         $output = '';
         foreach ([
-            'asks',
-            'bids',
-        ] as $type) {
+                     'asks',
+                     'bids',
+                 ] as $type) {
             $entries = $array[$type];
             if ($type === 'asks') {
                 $entries = array_reverse($entries);
@@ -2246,7 +2259,7 @@ class API
         // @codeCoverageIgnoreEnd
     }
 
-	/**
+    /**
      * bookTicker Get bookTicker for all symbols
      *
      * $api->bookTicker(function($api, $ticker) {
@@ -2256,7 +2269,7 @@ class API
      * @param $callback callable function closer that takes 2 arguments, $api and $ticker data
      * @return null
      */
-	public function bookTicker(callable $callback)
+    public function bookTicker(callable $callback)
     {
         $endpoint = '!bookticker';
         $this->subscriptions[$endpoint] = true;
@@ -2272,14 +2285,14 @@ class API
                 }
                 $json = json_decode($data, true);
 
-				$markets = [
-					"updateId"  => $json['u'],
-					"symbol"    => $json['s'],
-					"bid_price" => $json['b'],
-					"bid_qty"   => $json['B'],
-					"ask_price" => $json['a'],
-					"ask_qty"   => $json['A'],
-				];
+                $markets = [
+                    "updateId"  => $json['u'],
+                    "symbol"    => $json['s'],
+                    "bid_price" => $json['b'],
+                    "bid_qty"   => $json['B'],
+                    "ask_price" => $json['a'],
+                    "ask_qty"   => $json['A'],
+                ];
                 call_user_func($callback, $this, $markets);
             });
             $ws->on('close', function ($code = null, $reason = null) {
@@ -2341,10 +2354,10 @@ class API
         fwrite($fp, $result);
         fclose($fp);
     }
-    
+
     private function floorDecimal($n, $decimals=2)
-    {   
+    {
         return floor($n * pow(10, $decimals)) / pow(10, $decimals);
     }
-    
+
 }
