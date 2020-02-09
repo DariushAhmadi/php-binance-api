@@ -27,7 +27,7 @@ if (version_compare(phpversion(), '7.0', '<=')) {
  */
 class API
 {
-    protected $base = 'https://api.binance.com/api/'; // /< REST endpoint for the currency exchange
+    protected $base = 'https://api.binance.com/'; // /< REST endpoint for the currency exchange
     protected $wapi = 'https://api.binance.com/wapi/'; // /< REST endpoint for the withdrawals
     protected $stream = 'wss://stream.binance.com:9443/ws/'; // /< Endpoint for establishing websocket connections
     protected $api_key; // /< API key that you created in the binance website member area
@@ -899,7 +899,7 @@ class API
      * @return array containing the response
      * @throws \Exception
      */
-    private function httpRequest(string $url, string $method = "GET", array $params = [], bool $signed = false)
+    private function httpRequest(string $url, string $method = "GET", array $params = [], bool $signed = false,$future = false)
     {
         if (function_exists('curl_init') === false) {
             throw new \Exception("Sorry cURL is not installed!");
@@ -926,6 +926,7 @@ class API
             }
 
             $base = $this->base;
+	    $base .= ($future)? "api/" : "fapi/";
             $ts = (microtime(true) * 1000) + $this->info['timeOffset'];
             $params['timestamp'] = number_format($ts, 0, '.', '');
             if (isset($params['wapi'])) {
